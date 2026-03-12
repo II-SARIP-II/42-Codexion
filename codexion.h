@@ -17,8 +17,10 @@
 # include <limits.h>
 # include <stdio.h>
 # include <string.h>
+# include <pthread.h>
+# include "struct_elements.h"
 
-typedef struct s_datas
+typedef struct s_parsed
 {
 	int	number_of_coders;
 	int	time_to_burnout;
@@ -28,6 +30,9 @@ typedef struct s_datas
 	int	number_of_compiles_required;
 	int	dongle_cooldown;
 	int	scheduler;
-}	t_datas;
+}	t_parsed;
+
+t_elements	*init_datas(int nb);
+int	fill_data(t_parsed *datas, char **argv);
 
 #endif

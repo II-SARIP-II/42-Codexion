@@ -54,7 +54,7 @@ int	int_verif(char *str)
 	return (res);
 }
 
-int	fill_data(t_datas *datas, char **argv)
+int	fill_data(t_parsed *datas, char **argv)
 {
 	int	i;
 	int	*fields[8];
@@ -76,24 +76,6 @@ int	fill_data(t_datas *datas, char **argv)
 		i++;
 	}
 	return (0);
-}
-
-int	main(int argc, char **argv)
-{
-	t_datas	datas;
-
-	datas.number_of_coders = 0;
-	if (argc != 9)
-	{
-		fprintf(stderr, "Error: there are too many/few arguments\n");
-		return (1);
-	}
-	if (fill_data(&datas, argv) == -1)
-	{
-		fprintf(stderr, "Error: invalid argument\n");
-		return (1);
-	}
-	printf("nb_code: %d\nt_burnout: %d\nt_compile: %d\nt_debug: %d\nt_refactor: %d\nnb_compile_required: %d\ndongle_cooldown: %d\nscheduler: %d", datas.number_of_coders, datas.time_to_burnout, datas.time_to_compile, datas.time_to_debug, datas.time_to_refactor, datas.number_of_compiles_required, datas.dongle_cooldown, datas.scheduler);
 }
 
 /*
