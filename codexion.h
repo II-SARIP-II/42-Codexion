@@ -20,19 +20,8 @@
 # include <pthread.h>
 # include "struct_elements.h"
 
-typedef struct s_parsed
-{
-	int	number_of_coders;
-	int	time_to_burnout;
-	int	time_to_compile;
-	int	time_to_debug;
-	int	time_to_refactor;
-	int	number_of_compiles_required;
-	int	dongle_cooldown;
-	int	scheduler;
-}	t_parsed;
-
-t_elements	*init_datas(int nb);
-int	fill_data(t_parsed *datas, char **argv);
+t_elements	*init_datas(t_parsed parsed_datas);
+int			fill_data(t_parsed *datas, char **argv);
+void		*actions_loop(void *arg);
 
 #endif

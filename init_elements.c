@@ -20,6 +20,7 @@ void	new_dongle(t_dongle *dongle)
 	dongle->lr_time.tv_sec = 0;
 	dongle->queue = NULL;
 	dongle->scheduler = -1;
+	dongle->free = 0;
 }
 
 void	new_coder(t_coder *coders, t_dongle *d_left, t_dongle *d_right, int id)
@@ -38,16 +39,16 @@ int	get_right_dongle(int i, int nb)
 	return (i - 1);
 }
 
-t_elements	*init_datas(int nb)
+t_elements	*init_datas(t_parsed parsed_datas)
 {
 	t_elements	*datas;
-	int		i;
+	int			i;
 
 	datas = malloc(sizeof(t_elements));
 	if (!datas)
 		return (NULL);
-	datas->dongles = malloc(sizeof(t_dongle) * nb);
-	datas->coders = malloc(sizeof(t_coder) * nb);
+	datas->dongles = malloc(sizeof(t_dongle) * parsed_datas.number_of_coders);
+	datas->coders = malloc(sizeof(t_coder) * parsed_datas.number_of_coders);
 	if (!datas->dongles || !datas->coders)
 	{
 		if (datas->dongles)
@@ -58,11 +59,12 @@ t_elements	*init_datas(int nb)
 		return (NULL);
 	}
 	i = -1;
-	while (++i < nb)
+	while (++i < parsed_datas.number_of_coders)
 		new_dongle(&datas->dongles[i]);
 	i = -1;
-	while (++i < nb)
+	while (++i < parsed_datas.number_of_coders)
 		new_coder(&datas->coders[i], &datas->dongles[i],
-			&datas->dongles[get_right_dongle(i, nb)], i + 1);
+			&datas->dongles[get_right_dongle(i, parsed_datas.number_of_coders)], i + 1);
+	datas->parsed_datas = parsed_datas;
 	return (datas);
 }

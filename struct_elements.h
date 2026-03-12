@@ -15,32 +15,51 @@
 # include <sys/time.h>
 # include <pthread.h>
 
-struct	s_coder;
+typedef struct s_parsed
+{
+	int	number_of_coders;
+	int	time_to_burnout;
+	int	time_to_compile;
+	int	time_to_debug;
+	int	time_to_refactor;
+	int	number_of_compiles_required;
+	int	dongle_cooldown;
+	int	scheduler;
+}	t_parsed;
 
-typedef int	scheduler_t;
+struct		s_coder;
 
 typedef struct s_dongle
 {
 	pthread_mutex_t	lock;
 	pthread_cond_t	cond;
-	struct timeval			lr_time;	// last released time
+	struct timeval	lr_time;	// last released time
 	struct s_coder	*queue;		// Priority Queue
-	scheduler_t       scheduler;
+	int				scheduler;
+	int				free; 		// 0 = true 1 = false
 }	t_dongle;
 
 typedef struct s_coder
 {
-	int			id;
-	struct timeval		last_comp_start;
-	int			comp_count;
-	t_dongle	*d_left;
-	t_dongle	*d_right;
+	int				id;
+	struct timeval	last_comp_start;
+	int				comp_count;
+	t_dongle		*d_left;
+	t_dongle		*d_right;
 }	t_coder;
 
+// maybe add time parameter to manage the general time like the output
 typedef struct s_elements
 {
 	t_coder		*coders;
 	t_dongle	*dongles;
+	t_parsed	parsed_datas;
 }	t_elements;
+
+typedef struct s_thread_param
+{
+	t_elements	*elements;
+	int			idx;
+}	t_thread_param;
 
 #endif
