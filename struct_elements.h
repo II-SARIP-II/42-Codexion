@@ -54,6 +54,9 @@ typedef struct s_elements
 	t_coder		*coders;
 	t_dongle	*dongles;
 	t_parsed	parsed_datas;
+	struct timeval	start_time;
+	pthread_mutex_t	print_lock;
+	int				stop_sim;
 }	t_elements;
 
 typedef struct s_thread_param

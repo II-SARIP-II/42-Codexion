@@ -47,6 +47,7 @@ t_elements	*init_datas(t_parsed parsed_datas)
 	datas = malloc(sizeof(t_elements));
 	if (!datas)
 		return (NULL);
+	gettimeofday(&datas->start_time, NULL);
 	datas->dongles = malloc(sizeof(t_dongle) * parsed_datas.number_of_coders);
 	datas->coders = malloc(sizeof(t_coder) * parsed_datas.number_of_coders);
 	if (!datas->dongles || !datas->coders)
@@ -66,5 +67,6 @@ t_elements	*init_datas(t_parsed parsed_datas)
 		new_coder(&datas->coders[i], &datas->dongles[i],
 			&datas->dongles[get_right_dongle(i, parsed_datas.number_of_coders)], i + 1);
 	datas->parsed_datas = parsed_datas;
+	datas->stop_sim = 0;
 	return (datas);
 }
