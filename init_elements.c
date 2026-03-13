@@ -32,7 +32,7 @@ void	new_coder(t_coder *coders, t_dongle *d_left, t_dongle *d_right, int id)
 	coders->d_right = d_right;
 }
 
-int	get_right_dongle(int i, int nb)
+int	get_rd(int i, int nb)
 {
 	if (i == 0)
 		return (nb - 1);
@@ -52,11 +52,7 @@ t_elements	*init_datas(t_parsed parsed_datas)
 	datas->coders = malloc(sizeof(t_coder) * parsed_datas.number_of_coders);
 	if (!datas->dongles || !datas->coders)
 	{
-		if (datas->dongles)
-			free(datas->dongles);
-		if (datas->coders)
-			free(datas->coders);
-		free(datas);
+		errors(datas->dongles, datas->coders, datas, 1);
 		return (NULL);
 	}
 	i = -1;
@@ -65,7 +61,7 @@ t_elements	*init_datas(t_parsed parsed_datas)
 	i = -1;
 	while (++i < parsed_datas.number_of_coders)
 		new_coder(&datas->coders[i], &datas->dongles[i],
-			&datas->dongles[get_right_dongle(i, parsed_datas.number_of_coders)], i + 1);
+			&datas->dongles[get_rd(i, parsed_datas.number_of_coders)], i + 1);
 	datas->parsed_datas = parsed_datas;
 	datas->stop_sim = 0;
 	return (datas);

@@ -36,7 +36,7 @@ typedef struct s_dongle
 	struct timeval	lr_time;	// last released time
 	struct s_coder	*queue;		// Priority Queue
 	int				scheduler;
-	int				free; 		// 0 = true 1 = false
+	int				free;		// 0 = true 1 = false
 }	t_dongle;
 
 typedef struct s_coder
@@ -51,9 +51,9 @@ typedef struct s_coder
 // maybe add time parameter to manage the general time like the output
 typedef struct s_elements
 {
-	t_coder		*coders;
-	t_dongle	*dongles;
-	t_parsed	parsed_datas;
+	t_coder			*coders;
+	t_dongle		*dongles;
+	t_parsed		parsed_datas;
 	struct timeval	start_time;
 	pthread_mutex_t	print_lock;
 	int				stop_sim;

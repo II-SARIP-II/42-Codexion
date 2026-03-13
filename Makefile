@@ -2,7 +2,7 @@ CC      := cc
 CFLAGS  := -Wall -Wextra -Werror -pthread
 NAME    := codexion
 
-SRC     := actions.c codexion.c init_elements.c parsing.c
+SRC     := actions.c codexion.c init_elements.c parsing.c errors.c time_thread.c
 OBJS    := $(SRC:.c=.o)
 
 .PHONY: all clean fclean re try
@@ -22,6 +22,6 @@ fclean: clean
 	rm -f $(NAME)
 
 try: all
-	./codexion 3 3 3 3  3 3 3 3
+	./codexion 4 3 3 3  3 3 3 3
 
 re: fclean all
