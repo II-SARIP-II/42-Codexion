@@ -62,6 +62,7 @@ t_elements	*init_datas(t_parsed parsed_datas)
 	while (++i < parsed_datas.number_of_coders)
 		new_coder(&datas->coders[i], &datas->dongles[i],
 			&datas->dongles[get_rd(i, parsed_datas.number_of_coders)], i + 1);
+		//gettimeofday(datas->coders[i]->last_comp_start.tv_sec, NULL);
 	datas->parsed_datas = parsed_datas;
 	datas->stop_sim = 0;
 	return (datas);

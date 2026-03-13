@@ -16,7 +16,7 @@ void	print_locked_dongle(int id, char *msg, t_elements *elements)
 {
 	pthread_mutex_lock(&elements->print_lock);
 	if (!elements->stop_sim)
-		printf("%d %s\n", id);
+		printf("%d %s\n", id, msg);
 	pthread_mutex_unlock(&elements->print_lock);
 }
 
@@ -25,11 +25,11 @@ void	lock_dgl(int id, pthread_mutex_t *lock1,
 {
 	pthread_mutex_lock(lock1);
 	pthread_mutex_lock(lock2);
-	log_action(id, "has taken a dongle\n", elements);
-	printf(id, "has taken a dongle\n", elements);
+	log_action(id, "has taken a dongle", elements);
+	log_action(id, "has taken a dongle", elements);
 }
 
-void	free_dongles(t_coder coder)
+void	free_dongles(t_coder *coder)
 {
 	pthread_mutex_unlock(&coder->d_left->lock);
 	pthread_mutex_unlock(&coder->d_right->lock);
@@ -54,14 +54,15 @@ void	*actions_loop(void *arg)
 		if (coder->comp_count >= parsed_datas.number_of_compiles_required)
 			break ;
 		if (coder->id % 2 == 0)
-			lock_dgl(coder->id, &coder->d_left->lock, &coder->d_right->lock);
+			lock_dgl(coder->id, &coder->d_left->lock, &coder->d_right->lock, thread_param->elements);
 		else
-			lock_dgl(coder->id, &coder->d_right->lock, &coder->d_left->lock);
+			lock_dgl(coder->id, &coder->d_right->lock, &coder->d_left->lock, thread_param->elements);
 		while (coder->d_right->free == 1 && coder->d_left->free == 1)
 		{
 			pthread_cond_wait(&coder->d_right->cond, &coder->d_right->lock);
 			pthread_cond_wait(&coder->d_left->cond, &coder->d_left->lock);
 		}
+		gettimeofday(&coder->last_comp_start, NULL);
 		action(coder->id, parsed_datas.time_to_debug,
 			thread_param->elements, "is compiling");
 		coder->comp_count++;
