@@ -20,7 +20,8 @@ void	new_dongle(t_dongle *dongle)
 	dongle->lr_time.tv_sec = 0;
 	dongle->queue = NULL;
 	dongle->scheduler = -1;
-	dongle->free = 0;
+	dongle->free = 1;
+	gettimeofday(&dongle->lr_time, NULL);
 }
 
 void	new_coder(t_coder *coders, t_dongle *d_left, t_dongle *d_right, int id)
@@ -65,7 +66,7 @@ t_elements	*init_datas(t_parsed parsed_datas)
 			&datas->dongles[get_rd(i, parsed_datas.number_of_coders)], i + 1);
 		gettimeofday(&datas->coders[i].last_comp_start, NULL);
 		datas->coders[i].burnout = 1;
-		printf("init : Seconds since 1/1/1970: %ld\n", datas->coders[i].last_comp_start.tv_usec);
+		printf("init : %ld\n", datas->coders[i].last_comp_start.tv_usec);
 	}
 	datas->parsed_datas = parsed_datas;
 	datas->stop_sim = 0;

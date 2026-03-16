@@ -15,25 +15,29 @@
 void	*manager(void *elements_param)
 {
 	t_elements	*elements;
-	int	count;	// count how many people finished
-	int	i;
+	int			count;
+	int			i;
+	t_parsed	psd;
+	t_coder		*coders;
 
 	elements = elements_param;
+	psd = elements->parsed_datas;
+	coders = elements->coders;
 	while (1)
 	{
 		count = 0;
-		if (count >= elements->parsed_datas.number_of_coders)
+		if (count >= psd.number_of_coders)
 			break ;
 		i = 0;
-		while (i < elements->parsed_datas.number_of_coders)
+		while (i < psd.number_of_coders)
 		{
-			if (elements->coders[i].burnout == 0)
+			if (coders[i].burnout == 0)
 			{
-				printf("ECHOOOOO");
+				printf("!!!!!!!!!!!!!!!!!! BURNOUT !!!!!!!!!!!!!!!!!!");
 				elements->stop_sim = 1;
-				return (NULL) ;
+				return (NULL);
 			}
-			if (elements->coders[i].comp_count >= elements->parsed_datas.number_of_compiles_required)
+			if (coders[i].comp_count >= psd.number_of_compiles_required)
 				count++;
 			i++;
 		}

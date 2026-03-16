@@ -24,7 +24,7 @@ fclean: clean
 
 try: re
 	@echo "\n\n===========CODEXION==============\n\n"
-	@./codexion 3 3 3 3  3 3 3 3
+	@./codexion 10 800 200 200  200 10 50 1
 	@echo "\n\n===========CODEXION==============\n\n"
 	@make clean
 

@@ -36,7 +36,7 @@ typedef struct s_dongle
 	struct timeval	lr_time;	// last released time
 	struct s_coder	*queue;		// Priority Queue
 	int				scheduler;
-	int				free;		// 0 = true 1 = false
+	int				free;		// 1 = true 0 = false
 }	t_dongle;
 
 typedef struct s_coder

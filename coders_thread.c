@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
+#include "unistd.h"
 
 void	print_locked_dongle(int id, char *msg, t_elements *elements)
 {
@@ -24,22 +25,58 @@ void	lock_dgl(int id, pthread_mutex_t *lock1,
 	pthread_mutex_t *lock2, t_elements *elements)
 {
 	pthread_mutex_lock(lock1);
-	pthread_mutex_lock(lock2);
 	log_action(id, "has taken a dongle", elements);
+	pthread_mutex_lock(lock2);
 	log_action(id, "has taken a dongle", elements);
 }
 
 void	free_dongles(t_coder *coder)
 {
-	pthread_mutex_unlock(&coder->d_left->lock);
-	pthread_mutex_unlock(&coder->d_right->lock);
-	coder->d_left->free = 0;
-	coder->d_right->free = 0;
-	pthread_cond_broadcast(&coder->d_right->cond);
-	pthread_cond_broadcast(&coder->d_left->cond);
+	coder->d_left->free = 1;
+	coder->d_right->free = 1;
+	gettimeofday(&coder->d_right->lr_time, NULL);
+	gettimeofday(&coder->d_left->lr_time, NULL);
+	if (coder->d_left < coder->d_right)
+	{
+		pthread_mutex_unlock(&coder->d_right->lock);
+		pthread_mutex_unlock(&coder->d_left->lock);
+	}
+	else
+	{
+		pthread_mutex_unlock(&coder->d_left->lock);
+		pthread_mutex_unlock(&coder->d_right->lock);
+	}
 }
 
-// verifier tout le temps le shutdown + secure printf
+int	try_to_grab_dongles(t_coder *coder, t_elements *elements)
+{
+	if (coder->d_left < coder->d_right)
+	{
+		pthread_mutex_lock(&coder->d_left->lock);
+		pthread_mutex_lock(&coder->d_right->lock);
+	}
+	else
+	{
+		pthread_mutex_lock(&coder->d_right->lock);
+		pthread_mutex_lock(&coder->d_left->lock);
+	}
+	if (coder->d_left->free && coder->d_right->free
+		&& get_delta_time(&coder->d_left->lr_time)
+		>= elements->parsed_datas.dongle_cooldown
+		&& get_delta_time(&coder->d_right->lr_time)
+		>= elements->parsed_datas.dongle_cooldown)
+	{
+		coder->d_left->free = 0;
+		coder->d_right->free = 0;
+		log_action(coder->id, "has taken a dongle", elements);
+		log_action(coder->id, "has taken a dongle", elements);
+		return (1);
+	}
+	pthread_mutex_unlock(&coder->d_right->lock);
+	pthread_mutex_unlock(&coder->d_left->lock);
+	return (0);
+}
+
 void	*actions_loop(void *arg)
 {
 	t_thread_param	*thread_param;
@@ -51,28 +88,26 @@ void	*actions_loop(void *arg)
 	parsed_datas = thread_param->elements->parsed_datas;
 	while (1)
 	{
-		if (coder->comp_count >= parsed_datas.number_of_compiles_required || thread_param->elements->stop_sim == 1)
+		if (coder->comp_count >= parsed_datas.number_of_compiles_required
+			|| thread_param->elements->stop_sim == 1)
 			break ;
-		if (coder->id % 2 == 0)
-			lock_dgl(coder->id, &coder->d_left->lock, &coder->d_right->lock, thread_param->elements);
-		else
-			lock_dgl(coder->id, &coder->d_right->lock, &coder->d_left->lock, thread_param->elements);
-		while (coder->d_right->free == 1 && coder->d_left->free == 1)
+		if (try_to_grab_dongles(coder, thread_param->elements))
 		{
-			pthread_cond_wait(&coder->d_right->cond, &coder->d_right->lock);
-			pthread_cond_wait(&coder->d_left->cond, &coder->d_left->lock);
+			if (get_delta_time(&coder->last_comp_start)
+				>= parsed_datas.time_to_burnout)
+				coder->burnout = 0;
+			gettimeofday(&coder->last_comp_start, NULL);
+			action(coder->id, parsed_datas.time_to_debug,
+				thread_param->elements, "is compiling");
+			coder->comp_count++;
+			free_dongles(coder);
+			action(coder->id, parsed_datas.time_to_debug,
+				thread_param->elements, "is debugging");
+			action(coder->id, parsed_datas.time_to_refactor,
+				thread_param->elements, "is refactoring");
 		}
-		if (get_delta_time(&coder->last_comp_start) >= parsed_datas.time_to_burnout)
-			coder->burnout = 0;
-		gettimeofday(&coder->last_comp_start, NULL);
-		action(coder->id, parsed_datas.time_to_debug,
-			thread_param->elements, "is compiling");
-		coder->comp_count++;
-		free_dongles(coder);
-		action(coder->id, parsed_datas.time_to_debug,
-			thread_param->elements, "is debugging");
-		action(coder->id, parsed_datas.time_to_refactor,
-			thread_param->elements, "is refactoring");
+		else
+			usleep(500);
 	}
 	return (NULL);
 }
