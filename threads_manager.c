@@ -26,14 +26,12 @@ void	*manager(void *elements_param)
 	while (1)
 	{
 		count = 0;
-		if (count >= psd.number_of_coders)
-			break ;
 		i = 0;
 		while (i < psd.number_of_coders)
 		{
 			if (coders[i].burnout == 0)
 			{
-				printf("!!!!!!!!!!!!!!!!!! BURNOUT !!!!!!!!!!!!!!!!!!");
+				log_action(i, "burned out", elements);
 				elements->stop_sim = 1;
 				return (NULL);
 			}
@@ -41,6 +39,8 @@ void	*manager(void *elements_param)
 				count++;
 			i++;
 		}
+		if (count >= psd.number_of_coders)
+			break ;
 	}
 	return (NULL);
 }

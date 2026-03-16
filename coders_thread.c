@@ -50,6 +50,12 @@ void	free_dongles(t_coder *coder)
 
 int	try_to_grab_dongles(t_coder *coder, t_elements *elements)
 {
+	if (get_delta_time(&coder->last_comp_start)
+		>= elements->parsed_datas.time_to_burnout)
+	{
+		coder->burnout = 0;
+		return (2);
+	}
 	if (coder->d_left < coder->d_right)
 	{
 		pthread_mutex_lock(&coder->d_left->lock);
@@ -82,6 +88,7 @@ void	*actions_loop(void *arg)
 	t_thread_param	*thread_param;
 	t_coder			*coder;
 	t_parsed		parsed_datas;
+	int				take_dongles;
 
 	thread_param = (t_thread_param *)arg;
 	coder = &thread_param->elements->coders[thread_param->idx];
@@ -91,11 +98,9 @@ void	*actions_loop(void *arg)
 		if (coder->comp_count >= parsed_datas.number_of_compiles_required
 			|| thread_param->elements->stop_sim == 1)
 			break ;
-		if (try_to_grab_dongles(coder, thread_param->elements))
+		take_dongles = try_to_grab_dongles(coder, thread_param->elements);
+		if (take_dongles == 1)
 		{
-			if (get_delta_time(&coder->last_comp_start)
-				>= parsed_datas.time_to_burnout)
-				coder->burnout = 0;
 			gettimeofday(&coder->last_comp_start, NULL);
 			action(coder->id, parsed_datas.time_to_debug,
 				thread_param->elements, "is compiling");
@@ -106,6 +111,8 @@ void	*actions_loop(void *arg)
 			action(coder->id, parsed_datas.time_to_refactor,
 				thread_param->elements, "is refactoring");
 		}
+		else if (take_dongles == 2)
+			return (NULL);
 		else
 			usleep(500);
 	}
