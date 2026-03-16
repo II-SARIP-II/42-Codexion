@@ -2,7 +2,8 @@ CC      := cc
 CFLAGS  := -Wall -Wextra -Werror -pthread
 NAME    := codexion
 
-SRC     := actions_threads.c codexion.c init_elements.c parsing.c errors.c coders_thread.c
+SRC     := actions_threads.c codexion.c init_elements.c parsing.c\
+		errors.c coders_thread.c threads_manager.c
 OBJS    := $(SRC:.c=.o)
 
 .PHONY: all clean fclean re try
@@ -21,7 +22,10 @@ clean:
 fclean: clean
 	rm -f $(NAME)
 
-try: all
-	./codexion 3 3 3 3  3 3 3 3
+try: re
+	@echo "\n\n===========CODEXION==============\n\n"
+	@./codexion 3 3 3 3  3 3 3 3
+	@echo "\n\n===========CODEXION==============\n\n"
+	@make clean
 
 re: fclean all

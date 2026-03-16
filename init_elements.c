@@ -60,9 +60,13 @@ t_elements	*init_datas(t_parsed parsed_datas)
 		new_dongle(&datas->dongles[i]);
 	i = -1;
 	while (++i < parsed_datas.number_of_coders)
+	{
 		new_coder(&datas->coders[i], &datas->dongles[i],
 			&datas->dongles[get_rd(i, parsed_datas.number_of_coders)], i + 1);
-		//gettimeofday(datas->coders[i]->last_comp_start.tv_sec, NULL);
+		gettimeofday(&datas->coders[i].last_comp_start, NULL);
+		datas->coders[i].burnout = 1;
+		printf("init : Seconds since 1/1/1970: %ld\n", datas->coders[i].last_comp_start.tv_usec);
+	}
 	datas->parsed_datas = parsed_datas;
 	datas->stop_sim = 0;
 	return (datas);

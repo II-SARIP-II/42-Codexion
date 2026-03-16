@@ -12,12 +12,11 @@
 
 #include "codexion.h"
 #include "struct_elements.h"
-//debug
-#include "unistd.h"
 
 int	manage_threads(t_elements *elements)
 {
 	pthread_t		*threads;
+	pthread_t		manager_thread;
 	t_thread_param	*params;
 	int				i;
 
@@ -31,6 +30,7 @@ int	manage_threads(t_elements *elements)
 	if (!params)
 		return (errors(threads, NULL, NULL, 1));
 	params->elements = elements;
+	pthread_create(&manager_thread, NULL, manager, elements);
 	while (++i < elements->parsed_datas.number_of_coders)
 	{
 		params[i].elements = elements;

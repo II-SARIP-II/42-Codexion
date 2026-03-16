@@ -46,6 +46,7 @@ typedef struct s_coder
 	int				comp_count;
 	t_dongle		*d_left;
 	t_dongle		*d_right;
+	int				burnout;	// 0 = true 1 = false
 }	t_coder;
 
 // maybe add time parameter to manage the general time like the output
@@ -56,7 +57,7 @@ typedef struct s_elements
 	t_parsed		parsed_datas;
 	struct timeval	start_time;
 	pthread_mutex_t	print_lock;
-	int				stop_sim;
+	int				stop_sim;	// 0 = ok, 1 = error
 }	t_elements;
 
 typedef struct s_thread_param

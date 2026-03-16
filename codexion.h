@@ -28,5 +28,6 @@ void		precise_sleep(long sleep_time_ms, t_elements *elements);
 long		get_delta_time(struct timeval *start);
 void		log_action(int id, char *msg, t_elements *elements);
 void		action(int id, int time, t_elements *elements, char *msg);
+void		*manager(void *elements);
 
 #endif

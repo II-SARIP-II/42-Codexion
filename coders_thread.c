@@ -51,7 +51,7 @@ void	*actions_loop(void *arg)
 	parsed_datas = thread_param->elements->parsed_datas;
 	while (1)
 	{
-		if (coder->comp_count >= parsed_datas.number_of_compiles_required)
+		if (coder->comp_count >= parsed_datas.number_of_compiles_required || thread_param->elements->stop_sim == 1)
 			break ;
 		if (coder->id % 2 == 0)
 			lock_dgl(coder->id, &coder->d_left->lock, &coder->d_right->lock, thread_param->elements);
@@ -62,6 +62,8 @@ void	*actions_loop(void *arg)
 			pthread_cond_wait(&coder->d_right->cond, &coder->d_right->lock);
 			pthread_cond_wait(&coder->d_left->cond, &coder->d_left->lock);
 		}
+		if (get_delta_time(&coder->last_comp_start) >= parsed_datas.time_to_burnout)
+			coder->burnout = 0;
 		gettimeofday(&coder->last_comp_start, NULL);
 		action(coder->id, parsed_datas.time_to_debug,
 			thread_param->elements, "is compiling");
