@@ -57,7 +57,7 @@ typedef struct s_elements
 	struct timeval	start_time;
 	pthread_mutex_t	print_lock;
 	int				stop_sim;	// 0 = ok, 1 = error
-	pthread_mutex_t state_lock; // New: protects comp_count, burnout, and last_comp_start
+	pthread_mutex_t	state_lock; // New: protects comp_count, and last_comp_start
 }	t_elements;
 
 typedef struct s_thread_param

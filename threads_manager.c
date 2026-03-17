@@ -31,7 +31,8 @@ void	*manager(void *elements_param)
 		while (i < psd.number_of_coders)
 		{
 			pthread_mutex_lock(&elements->state_lock);
-			if (get_delta_time(&coders[i].last_comp_start) >= psd.time_to_burnout)
+			if (get_delta_time(&coders[i].last_comp_start)
+				>= psd.time_to_burnout)
 			{
 				log_action(coders[i].id, "burned out", elements);
 				elements->stop_sim = 1;

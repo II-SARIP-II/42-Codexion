@@ -37,7 +37,7 @@ void	free_dongles(t_coder *coder)
 	gettimeofday(&coder->d_right->lr_time, NULL);
 	gettimeofday(&coder->d_left->lr_time, NULL);
 	pthread_cond_broadcast(&coder->d_left->cond);
-    pthread_cond_broadcast(&coder->d_right->cond);
+	pthread_cond_broadcast(&coder->d_right->cond);
 	if (coder->d_left < coder->d_right)
 	{
 		pthread_mutex_unlock(&coder->d_right->lock);
@@ -79,9 +79,9 @@ int	try_to_grab_dongles(t_coder *coder, t_elements *elements)
 	return (0);
 }
 
-void get_timeout(struct timespec *ts, int ms_to_wait)
+void	get_timeout(struct timespec *ts, int ms_to_wait)
 {
-	struct timeval tv;
+	struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
 	ts->tv_sec = tv.tv_sec + (ms_to_wait / 1000);
@@ -98,6 +98,7 @@ void	*actions_loop(void *arg)
 	t_thread_param	*thread_param;
 	t_coder			*coder;
 	t_parsed		parsed_datas;
+	struct timespec	ts;
 
 	thread_param = (t_thread_param *)arg;
 	coder = &thread_param->elements->coders[thread_param->idx];
@@ -129,11 +130,11 @@ void	*actions_loop(void *arg)
 				thread_param->elements, "is refactoring");
 		}
 		else
-    	{
-			struct timespec ts;
+		{
 			get_timeout(&ts, 10);
 			pthread_mutex_lock(&coder->d_left->lock);
-			pthread_cond_timedwait(&coder->d_left->cond, &coder->d_left->lock, &ts);
+			pthread_cond_timedwait(&coder->d_left->cond,
+				&coder->d_left->lock, &ts);
 			pthread_mutex_unlock(&coder->d_left->lock);
 		}
 	}
