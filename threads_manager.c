@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
+#include <unistd.h>
 
 void	*manager(void *elements_param)
 {
@@ -29,18 +30,22 @@ void	*manager(void *elements_param)
 		i = 0;
 		while (i < psd.number_of_coders)
 		{
-			if (coders[i].burnout == 0)
+			pthread_mutex_lock(&elements->state_lock);
+			if (get_delta_time(&coders[i].last_comp_start) >= psd.time_to_burnout)
 			{
-				log_action(i, "burned out", elements);
+				log_action(coders[i].id, "burned out", elements);
 				elements->stop_sim = 1;
+				pthread_mutex_unlock(&elements->state_lock);
 				return (NULL);
 			}
 			if (coders[i].comp_count >= psd.number_of_compiles_required)
 				count++;
+			pthread_mutex_unlock(&elements->state_lock);
 			i++;
 		}
 		if (count >= psd.number_of_coders)
 			break ;
+		usleep(200);
 	}
 	return (NULL);
 }

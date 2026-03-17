@@ -36,6 +36,8 @@ void	free_dongles(t_coder *coder)
 	coder->d_right->free = 1;
 	gettimeofday(&coder->d_right->lr_time, NULL);
 	gettimeofday(&coder->d_left->lr_time, NULL);
+	pthread_cond_broadcast(&coder->d_left->cond);
+    pthread_cond_broadcast(&coder->d_right->cond);
 	if (coder->d_left < coder->d_right)
 	{
 		pthread_mutex_unlock(&coder->d_right->lock);
@@ -50,12 +52,6 @@ void	free_dongles(t_coder *coder)
 
 int	try_to_grab_dongles(t_coder *coder, t_elements *elements)
 {
-	if (get_delta_time(&coder->last_comp_start)
-		>= elements->parsed_datas.time_to_burnout)
-	{
-		coder->burnout = 0;
-		return (2);
-	}
 	if (coder->d_left < coder->d_right)
 	{
 		pthread_mutex_lock(&coder->d_left->lock);
@@ -83,38 +79,63 @@ int	try_to_grab_dongles(t_coder *coder, t_elements *elements)
 	return (0);
 }
 
+void get_timeout(struct timespec *ts, int ms_to_wait)
+{
+	struct timeval tv;
+
+	gettimeofday(&tv, NULL);
+	ts->tv_sec = tv.tv_sec + (ms_to_wait / 1000);
+	ts->tv_nsec = (tv.tv_usec * 1000) + ((ms_to_wait % 1000) * 1000000);
+	if (ts->tv_nsec >= 1000000000)
+	{
+		ts->tv_sec++;
+		ts->tv_nsec -= 1000000000;
+	}
+}
+
 void	*actions_loop(void *arg)
 {
 	t_thread_param	*thread_param;
 	t_coder			*coder;
 	t_parsed		parsed_datas;
-	int				take_dongles;
 
 	thread_param = (t_thread_param *)arg;
 	coder = &thread_param->elements->coders[thread_param->idx];
 	parsed_datas = thread_param->elements->parsed_datas;
 	while (1)
 	{
+		pthread_mutex_lock(&thread_param->elements->state_lock);
 		if (coder->comp_count >= parsed_datas.number_of_compiles_required
 			|| thread_param->elements->stop_sim == 1)
-			break ;
-		take_dongles = try_to_grab_dongles(coder, thread_param->elements);
-		if (take_dongles == 1)
 		{
+			pthread_mutex_unlock(&thread_param->elements->state_lock);
+			break ;
+		}
+		pthread_mutex_unlock(&thread_param->elements->state_lock);
+		if (try_to_grab_dongles(coder, thread_param->elements) == 1)
+		{
+			pthread_mutex_lock(&thread_param->elements->state_lock);
 			gettimeofday(&coder->last_comp_start, NULL);
+			pthread_mutex_unlock(&thread_param->elements->state_lock);
 			action(coder->id, parsed_datas.time_to_debug,
 				thread_param->elements, "is compiling");
+			pthread_mutex_lock(&thread_param->elements->state_lock);
 			coder->comp_count++;
+			pthread_mutex_unlock(&thread_param->elements->state_lock);
 			free_dongles(coder);
 			action(coder->id, parsed_datas.time_to_debug,
 				thread_param->elements, "is debugging");
 			action(coder->id, parsed_datas.time_to_refactor,
 				thread_param->elements, "is refactoring");
 		}
-		else if (take_dongles == 2)
-			return (NULL);
 		else
-			usleep(500);
+    	{
+			struct timespec ts;
+			get_timeout(&ts, 10);
+			pthread_mutex_lock(&coder->d_left->lock);
+			pthread_cond_timedwait(&coder->d_left->cond, &coder->d_left->lock, &ts);
+			pthread_mutex_unlock(&coder->d_left->lock);
+		}
 	}
 	return (NULL);
 }

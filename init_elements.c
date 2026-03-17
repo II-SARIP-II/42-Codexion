@@ -65,7 +65,6 @@ t_elements	*init_datas(t_parsed parsed_datas)
 		new_coder(&datas->coders[i], &datas->dongles[i],
 			&datas->dongles[get_rd(i, parsed_datas.number_of_coders)], i + 1);
 		gettimeofday(&datas->coders[i].last_comp_start, NULL);
-		datas->coders[i].burnout = 1;
 		printf("init : %ld\n", datas->coders[i].last_comp_start.tv_usec);
 	}
 	datas->parsed_datas = parsed_datas;

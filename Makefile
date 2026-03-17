@@ -1,5 +1,5 @@
 CC      := cc
-CFLAGS  := -Wall -Wextra -Werror -pthread
+CFLAGS  := -Wall -Wextra -Werror -pthread # -fsanitize=thread
 NAME    := codexion
 
 SRC     := actions_threads.c codexion.c init_elements.c parsing.c\
