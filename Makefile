@@ -3,7 +3,8 @@ CFLAGS  := -Wall -Wextra -Werror -pthread # -fsanitize=thread
 NAME    := codexion
 
 SRC     := actions_threads.c codexion.c init_elements.c parsing.c\
-		errors.c coders_thread.c threads_manager.c
+		errors.c coders_thread.c threads_manager.c scheduler.c\
+		dongle_thread.c
 OBJS    := $(SRC:.c=.o)
 
 .PHONY: all clean fclean re try leak
