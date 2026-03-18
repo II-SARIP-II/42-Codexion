@@ -59,30 +59,6 @@ int	manage_threads(t_elements *elements)
 	return (errors(threads, params, NULL, 0));
 }
 
-int	clear_mutex(t_elements *elements)
-{
-	int	i;
-
-	i = 0;
-	while (i < elements->parsed_datas.number_of_coders)
-	{
-		pthread_mutex_destroy(&elements->dongles[i].lock);
-		i++;
-	}
-	pthread_mutex_destroy(&elements->print_lock);
-	pthread_mutex_destroy(&elements->state_lock);
-	return (0);
-}
-
-void	clear_queue(t_elements *elements)
-{
-	int	i;
-
-	i = -1;
-	while (++i < elements->parsed_datas.number_of_coders)
-		free(elements->dongles[i].queue);
-}
-
 int	print_errors(char *msg, int return_value)
 {
 	fprintf(stderr, "%s\n", msg);

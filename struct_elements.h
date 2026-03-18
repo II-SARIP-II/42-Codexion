@@ -33,8 +33,8 @@ typedef struct s_dongle
 {
 	pthread_mutex_t	lock;
 	pthread_cond_t	cond;
-	struct timeval	lr_time;	// last released time
-	struct s_coder	**queue;		// Priority Queue
+	struct timeval	lr_time;
+	struct s_coder	**queue;
 	int				free;		// 1 = true 0 = false
 }	t_dongle;
 

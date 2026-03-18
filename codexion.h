@@ -36,5 +36,7 @@ void		remove_from_queue(t_dongle *d, t_coder *coder);
 void		free_dongles(t_coder *coder);
 int			try_to_grab_dongles(t_coder *coder, t_elements *elements);
 int			add_to_queue(t_dongle *d, t_coder *coder);
+int			clear_mutex(t_elements *elements);
+void		clear_queue(t_elements *elements);
 
 #endif

@@ -13,6 +13,13 @@
 #include "codexion.h"
 #include <unistd.h>
 
+void	forced_print(int id, char *msg, t_elements *elements)
+{
+	pthread_mutex_lock(&elements->print_lock);
+	printf("%ld %d %s\n", get_delta_time(&elements->start_time), id, msg);
+	pthread_mutex_unlock(&elements->print_lock);
+}
+
 int	verif(int *count, t_elements *el)
 {
 	int			i;
@@ -26,9 +33,9 @@ int	verif(int *count, t_elements *el)
 		if (get_delta_time(&el->coders[i].last_comp_start)
 			>= psd.time_to_burnout)
 		{
-			log_action(el->coders[i].id, "burned out", el);
 			el->stop_sim = 1;
 			pthread_mutex_unlock(&el->state_lock);
+			forced_print(el->coders[i].id, "burned out", el);
 			return (-1);
 		}
 		if (el->coders[i].comp_count >= psd.number_of_compiles_required)

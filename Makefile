@@ -3,7 +3,7 @@ CFLAGS  := -Wall -Wextra -Werror -pthread # -fsanitize=thread
 NAME    := codexion
 
 SRC     := actions_threads.c codexion.c init_elements.c parsing.c\
-		errors.c coders_thread.c threads_manager.c scheduler.c\
+		clear.c coders_thread.c threads_manager.c scheduler.c\
 		dongle_thread.c
 OBJS    := $(SRC:.c=.o)
 
@@ -27,22 +27,24 @@ run: re
 	@echo "\n\n===========CODEXION==============\n\n"
 	@./codexion 10 800 100 100  100 10 50 "fifo"
 	@echo "\n\n===========CODEXION==============\n\n"
-	@make clean
+	@make fclean
 
+# DO NOT EXECUTE THIS IF THE FLAG -FSANITIZE=THREAD
 leak: re
 	@echo "\n\n===========CODEXION==============\n\n"
-	@valgrind  --leak-check=full ./codexion 5 800 100 100  100 10 50 "fifo"
+
+	@valgrind  --leak-check=full ./codexion 5 800 100 100  100 10 50 "edf"
 	@echo "\n\n===========CODEXION==============\n\n"
-	@make clean
+	@make fclean
 
 GREEN = \033[0;32m
 RED   = \033[0;31m
 RESET = \033[0m
 tests: re
 	@echo "Lancement du stress test (10 itérations)..."
-	@i=1; while [ $$i -le 100 ]; do \
-		echo -n "Test $$i/100 : "; \
-		./codexion 10 800 100 100 100 10 50 "fifo" > test_output.log 2>&1; \
+	@i=1; while [ $$i -le 10 ]; do \
+		echo -n "Test $$i/10 : "; \
+		./codexion 10 800 100 100 100 5 50 "fifo" > test_output.log 2>&1; \
 		if grep -q "burned out" test_output.log; then \
 			echo "$(RED)[FAILED]$(RESET)"; \
 			cat test_output.log; \
@@ -55,7 +57,7 @@ tests: re
 	done
 	@echo "$(GREEN)Félicitations ! Tous les tests ont réussi.$(RESET)"
 	@rm -f test_output.log
-	@$(MAKE) clean
+	@$(MAKE) fclean
 
 
 re: fclean all
