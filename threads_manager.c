@@ -13,11 +13,36 @@
 #include "codexion.h"
 #include <unistd.h>
 
+int	verif(int *count, t_elements *el)
+{
+	int			i;
+	t_parsed	psd;
+
+	psd = el->parsed_datas;
+	i = 0;
+	while (i < psd.number_of_coders)
+	{
+		pthread_mutex_lock(&el->state_lock);
+		if (get_delta_time(&el->coders[i].last_comp_start)
+			>= psd.time_to_burnout)
+		{
+			log_action(el->coders[i].id, "burned out", el);
+			el->stop_sim = 1;
+			pthread_mutex_unlock(&el->state_lock);
+			return (-1);
+		}
+		if (el->coders[i].comp_count >= psd.number_of_compiles_required)
+			(*count)++;
+		pthread_mutex_unlock(&el->state_lock);
+		i++;
+	}
+	return (0);
+}
+
 void	*manager(void *elements_param)
 {
 	t_elements	*elements;
 	int			count;
-	int			i;
 	t_parsed	psd;
 	t_coder		*coders;
 
@@ -27,26 +52,13 @@ void	*manager(void *elements_param)
 	while (1)
 	{
 		count = 0;
-		i = 0;
-		while (i < psd.number_of_coders)
-		{
-			pthread_mutex_lock(&elements->state_lock);
-			if (get_delta_time(&coders[i].last_comp_start)
-				>= psd.time_to_burnout)
-			{
-				log_action(coders[i].id, "burned out", elements);
-				elements->stop_sim = 1;
-				pthread_mutex_unlock(&elements->state_lock);
-				return (NULL);
-			}
-			if (coders[i].comp_count >= psd.number_of_compiles_required)
-				count++;
-			pthread_mutex_unlock(&elements->state_lock);
-			i++;
-		}
+		if (verif(&count, elements) == -1)
+			return (NULL);
 		if (count >= psd.number_of_coders)
 		{
+			pthread_mutex_lock(&elements->state_lock);
 			elements->stop_sim = 1;
+			pthread_mutex_unlock(&elements->state_lock);
 			break ;
 		}
 		usleep(100);

@@ -30,7 +30,7 @@ run: re
 
 leak: re
 	@echo "\n\n===========CODEXION==============\n\n"
-	@valgrind  --leak-check=full ./codexion 5 800 100 100  100 3 50 "fifo"
+	@valgrind  --leak-check=full ./codexion 5 800 100 100  100 10 50 "fifo"
 	@echo "\n\n===========CODEXION==============\n\n"
 	@make clean
 
