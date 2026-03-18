@@ -45,8 +45,11 @@ void	*manager(void *elements_param)
 			i++;
 		}
 		if (count >= psd.number_of_coders)
+		{
+			elements->stop_sim = 1;
 			break ;
-		usleep(200);
+		}
+		usleep(100);
 	}
 	return (NULL);
 }

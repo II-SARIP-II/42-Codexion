@@ -9,3 +9,5 @@ test/
 codexion
 
 *.o
+
+test_output.log

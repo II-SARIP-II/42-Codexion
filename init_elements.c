@@ -18,8 +18,9 @@ void	new_dongle(t_dongle *dongle)
 	pthread_mutex_init(&dongle->lock, NULL);
 	pthread_cond_init(&dongle->cond, NULL);
 	dongle->lr_time.tv_sec = 0;
-	dongle->queue = NULL;
-	dongle->scheduler = -1;
+	dongle->queue = malloc(sizeof(t_coder *) * 2);
+	dongle->queue[0] = NULL;
+	dongle->queue[1] = NULL;
 	dongle->free = 1;
 	gettimeofday(&dongle->lr_time, NULL);
 }
@@ -40,7 +41,7 @@ int	get_rd(int i, int nb)
 	return (i - 1);
 }
 
-t_elements	*init_datas(t_parsed parsed_datas)
+t_elements	*init_datas(t_parsed *parsed_datas)
 {
 	t_elements	*datas;
 	int			i;
@@ -49,25 +50,26 @@ t_elements	*init_datas(t_parsed parsed_datas)
 	if (!datas)
 		return (NULL);
 	gettimeofday(&datas->start_time, NULL);
-	datas->dongles = malloc(sizeof(t_dongle) * parsed_datas.number_of_coders);
-	datas->coders = malloc(sizeof(t_coder) * parsed_datas.number_of_coders);
+	datas->dongles = malloc(sizeof(t_dongle) * parsed_datas->number_of_coders);
+	datas->coders = malloc(sizeof(t_coder) * parsed_datas->number_of_coders);
+	pthread_mutex_init(&datas->print_lock, NULL);
+	pthread_mutex_init(&datas->state_lock, NULL);
 	if (!datas->dongles || !datas->coders)
 	{
 		errors(datas->dongles, datas->coders, datas, 1);
 		return (NULL);
 	}
 	i = -1;
-	while (++i < parsed_datas.number_of_coders)
+	while (++i < parsed_datas->number_of_coders)
 		new_dongle(&datas->dongles[i]);
 	i = -1;
-	while (++i < parsed_datas.number_of_coders)
+	while (++i < parsed_datas->number_of_coders)
 	{
 		new_coder(&datas->coders[i], &datas->dongles[i],
-			&datas->dongles[get_rd(i, parsed_datas.number_of_coders)], i + 1);
+			&datas->dongles[get_rd(i, parsed_datas->number_of_coders)], i + 1);
 		gettimeofday(&datas->coders[i].last_comp_start, NULL);
-		printf("init : %ld\n", datas->coders[i].last_comp_start.tv_usec);
 	}
-	datas->parsed_datas = parsed_datas;
+	datas->parsed_datas = *parsed_datas;
 	datas->stop_sim = 0;
 	return (datas);
 }

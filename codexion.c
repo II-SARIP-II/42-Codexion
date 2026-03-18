@@ -40,15 +40,33 @@ int	manage_threads(t_elements *elements)
 	i = -1;
 	while (++i < elements->parsed_datas.number_of_coders)
 		pthread_join(threads[i], NULL);
-	return (errors(threads, params, NULL, 0));
+	pthread_join(manager_thread, NULL);
+	free(threads);
+	free(params);
+	return (0);
+}
+
+int	clear_threads(t_elements *elements)
+{
+	int	i;
+
+	i = 0;
+	while (i < elements->parsed_datas.number_of_coders)
+	{
+		pthread_mutex_destroy(&elements->dongles[i].lock);
+		i++;
+	}
+	pthread_mutex_destroy(&elements->print_lock);
+	pthread_mutex_destroy(&elements->state_lock);
+	return (0);
 }
 
 int	main(int argc, char **argv)
 {
 	t_parsed	parsed_datas;
 	t_elements	*elements;
+	int			i;
 
-	parsed_datas.number_of_coders = 0;
 	if (argc != 9)
 	{
 		fprintf(stderr, "Error: there are too many/few arguments\n");
@@ -59,12 +77,16 @@ int	main(int argc, char **argv)
 		fprintf(stderr, "Error: invalid argument\n");
 		return (1);
 	}
-	elements = init_datas(parsed_datas);
+	elements = init_datas(&parsed_datas);
 	if (!elements)
 	{
 		fprintf(stderr, "Error: failed to allocate memory\n");
 		return (1);
 	}
 	manage_threads(elements);
+	clear_threads(elements);
+	i = -1;
+	while (++i < parsed_datas.number_of_coders)
+		free(elements->dongles[i].queue);
 	return (errors(elements->coders, elements->dongles, elements, 0));
 }

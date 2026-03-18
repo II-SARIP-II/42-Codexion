@@ -31,7 +31,7 @@ void	precise_sleep(long sleep_time_ms, t_elements *elements)
 
 	start = get_delta_time(&elements->start_time);
 	while (get_delta_time(&elements->start_time) < start + sleep_time_ms)
-		usleep(500);
+		usleep(100);
 }
 
 void	log_action(int id, char *msg, t_elements *elements)

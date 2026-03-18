@@ -24,7 +24,7 @@ typedef struct s_parsed
 	int	time_to_refactor;
 	int	number_of_compiles_required;
 	int	dongle_cooldown;
-	int	scheduler;
+	int	scheduler;		// 0 == fifo 1 == edf
 }	t_parsed;
 
 struct		s_coder;
@@ -34,8 +34,7 @@ typedef struct s_dongle
 	pthread_mutex_t	lock;
 	pthread_cond_t	cond;
 	struct timeval	lr_time;	// last released time
-	struct s_coder	*queue;		// Priority Queue
-	int				scheduler;
+	struct s_coder	**queue;		// Priority Queue
 	int				free;		// 1 = true 0 = false
 }	t_dongle;
 
@@ -48,7 +47,6 @@ typedef struct s_coder
 	t_dongle		*d_right;
 }	t_coder;
 
-// maybe add time parameter to manage the general time like the output
 typedef struct s_elements
 {
 	t_coder			*coders;
@@ -57,7 +55,7 @@ typedef struct s_elements
 	struct timeval	start_time;
 	pthread_mutex_t	print_lock;
 	int				stop_sim;	// 0 = ok, 1 = error
-	pthread_mutex_t	state_lock; // New: protects comp_count, and last_comp_start
+	pthread_mutex_t	state_lock; // protects comp_count, and last_comp_start
 }	t_elements;
 
 typedef struct s_thread_param

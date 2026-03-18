@@ -68,13 +68,22 @@ int	fill_data(t_parsed *datas, char **argv)
 	fields[6] = &datas->dongle_cooldown;
 	fields[7] = &datas->scheduler;
 	i = 0;
-	while (i < 8)
+	printf("%d", *fields[7]);
+	while (i < 7)
 	{
 		*fields[i] = int_verif(argv[i + 1]);
 		if (*fields[i] == -1)
 			return (-1);
 		i++;
 	}
+	printf("%d", *fields[7]);
+	if (strcmp(argv[8], "fifo") == 0)
+		*fields[7] = 0;
+	else if (strcmp(argv[8], "edf") == 0)
+		*fields[7] = 1;
+	else
+		return (-1);
+	printf("echo%d\n\n", *fields[7]);
 	return (0);
 }
 
