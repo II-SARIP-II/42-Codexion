@@ -21,15 +21,6 @@ void	print_locked_dongle(int id, char *msg, t_elements *elements)
 	pthread_mutex_unlock(&elements->print_lock);
 }
 
-void	lock_dgl(int id, pthread_mutex_t *lock1,
-	pthread_mutex_t *lock2, t_elements *elements)
-{
-	pthread_mutex_lock(lock1);
-	log_action(id, "has taken a dongle", elements);
-	pthread_mutex_lock(lock2);
-	log_action(id, "has taken a dongle", elements);
-}
-
 void	free_dongles(t_coder *coder)
 {
 	coder->d_left->free = 1;
@@ -92,7 +83,18 @@ void	remove_from_queue(t_dongle *d, t_coder *coder)
 	}
 }
 
-int	try_to_grab_dongles(t_coder *coder, t_elements *elements)
+int	take_dongle(t_coder *coder, t_elements *elements)
+{
+	coder->d_left->free = 0;
+	coder->d_right->free = 0;
+	remove_from_queue(coder->d_left, coder);
+	remove_from_queue(coder->d_right, coder);
+	log_action(coder->id, "has taken a dongle", elements);
+	log_action(coder->id, "has taken a dongle", elements);
+	return (1);
+}
+
+void	lock_dgl(t_coder *coder)
 {
 	if (coder->d_left < coder->d_right)
 	{
@@ -104,6 +106,11 @@ int	try_to_grab_dongles(t_coder *coder, t_elements *elements)
 		pthread_mutex_lock(&coder->d_right->lock);
 		pthread_mutex_lock(&coder->d_left->lock);
 	}
+}
+
+int	try_to_grab_dongles(t_coder *coder, t_elements *elements)
+{
+	lock_dgl(coder);
 	if (coder->d_left->free && coder->d_right->free
 		&& get_delta_time(&coder->d_left->lr_time)
 		>= elements->parsed_datas.dongle_cooldown
@@ -114,29 +121,13 @@ int	try_to_grab_dongles(t_coder *coder, t_elements *elements)
 		{
 			if (is_priority(coder->d_left, coder)
 				&& is_priority(coder->d_right, coder))
-			{
-				coder->d_left->free = 0;
-				coder->d_right->free = 0;
-				remove_from_queue(coder->d_left, coder);
-				remove_from_queue(coder->d_right, coder);
-				log_action(coder->id, "has taken a dongle", elements);
-				log_action(coder->id, "has taken a dongle", elements);
-				return (1);
-			}
+				return (take_dongle(coder, elements));
 		}
 		else if (elements->parsed_datas.scheduler == 1)
 		{
 			if (is_priority_edf(coder->d_left, coder, elements)
 				&& is_priority_edf(coder->d_right, coder, elements))
-			{
-				coder->d_left->free = 0;
-				coder->d_right->free = 0;
-				remove_from_queue(coder->d_left, coder);
-				remove_from_queue(coder->d_right, coder);
-				log_action(coder->id, "has taken a dongle", elements);
-				log_action(coder->id, "has taken a dongle", elements);
-				return (1);
-			}
+				return (take_dongle(coder, elements));
 		}
 	}
 	pthread_mutex_unlock(&coder->d_right->lock);
@@ -194,6 +185,28 @@ void	coder_actions(t_thread_param	*thread_param)
 		thread_param->elements, "is debugging");
 	action(coder->id, parsed_datas.time_to_refactor,
 		thread_param->elements, "is refactoring");
+}
+
+static int	wait_for_dongles(t_coder *coder, t_thread_param *thread_param, struct timespec *ts)
+{
+	while (1)
+	{
+		if (try_to_grab_dongles(coder, thread_param->elements) == 1)
+			break ;
+		get_timeout(&ts, 10);
+		pthread_mutex_lock(&coder->d_left->lock);
+		if (!thread_param->elements->stop_sim)
+			pthread_cond_timedwait(&coder->d_left->cond,
+				&coder->d_left->lock, &ts);
+		pthread_mutex_unlock(&coder->d_left->lock);
+		pthread_mutex_lock(&thread_param->elements->state_lock);
+		if (thread_param->elements->stop_sim)
+		{
+			pthread_mutex_unlock(&thread_param->elements->state_lock);
+			return (NULL);
+		}
+		pthread_mutex_unlock(&thread_param->elements->state_lock);
+	}
 }
 
 void	*actions_loop(void *arg)
