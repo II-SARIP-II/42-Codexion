@@ -25,7 +25,7 @@ fclean: clean
 
 run: re
 	@echo "\n\n===========CODEXION==============\n\n"
-	@./codexion 1 400 100 100  100 10 50 "fifo"
+	@./codexion 10 400 100 100  100 10 50 "fifo"
 	@echo "\n\n===========CODEXION==============\n\n"
 	@make fclean
 
@@ -33,7 +33,7 @@ run: re
 leak: re
 	@echo "\n\n===========CODEXION==============\n\n"
 
-	@valgrind  --leak-check=full ./codexion 1 800 100 100  100 10 50 "edf"
+	@valgrind  --leak-check=full ./codexion 10 800 100 100  100 10 50 "edf"
 	@echo "\n\n===========CODEXION==============\n\n"
 	@make fclean
 
