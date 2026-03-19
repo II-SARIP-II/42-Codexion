@@ -10,7 +10,6 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "struct_elements.h"
 #include "codexion.h"
 
 int	new_dongle(t_dongle *dongle)

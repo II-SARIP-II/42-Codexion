@@ -31,7 +31,6 @@ void		action(int id, int time, t_elements *elements, char *msg);
 void		*manager(void *elements);
 int			edf(t_dongle *d, t_coder *coder, t_elements *el);
 int			fifo(t_dongle *d, t_coder *coder);
-int			is_priority(t_dongle *d, t_coder *coder);
 void		remove_from_queue(t_dongle *d, t_coder *coder);
 void		free_dongles(t_coder *coder);
 int			try_to_grab_dongles(t_coder *coder, t_elements *elements);

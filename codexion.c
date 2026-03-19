@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
-#include "struct_elements.h"
 
 static int	create_threads(t_elements *el, pthread_t *th, t_thread_param *p)
 {

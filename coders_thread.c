@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   actions.c                                          :+:      :+:    :+:   */
+/*   coders_thread.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pgougne <pgougne@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -91,7 +91,7 @@ void	*actions_loop(void *arg)
 	while (1)
 	{
 		pthread_mutex_lock(&tp->elements->state_lock);
-		if (tp->elements->stop_sim)
+		if (tp->elements->stop_sim || parsed_datas.number_of_coders == 1)
 			return (pthread_mutex_unlock(&tp->elements->state_lock), NULL);
 		pthread_mutex_unlock(&tp->elements->state_lock);
 		add_to_queue(coder->d_right, coder);

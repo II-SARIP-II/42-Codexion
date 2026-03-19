@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   time_thread.c                                      :+:      :+:    :+:   */
+/*   actions_threads.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pgougne <pgougne@student.42lyon.fr>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -36,15 +36,13 @@ void	precise_sleep(long sleep_time_ms, t_elements *elements)
 
 void	log_action(int id, char *msg, t_elements *elements)
 {
-	int stop;
+	int	stop;
 
 	pthread_mutex_lock(&elements->state_lock);
 	stop = elements->stop_sim;
 	pthread_mutex_unlock(&elements->state_lock);
-
 	if (stop)
-		return;
-
+		return ;
 	pthread_mutex_lock(&elements->print_lock);
 	printf("%ld %d %s\n", get_delta_time(&elements->start_time), id, msg);
 	pthread_mutex_unlock(&elements->print_lock);
