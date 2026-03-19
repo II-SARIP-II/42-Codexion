@@ -1,5 +1,5 @@
 CC      := cc
-CFLAGS  := -Wall -Wextra -Werror -pthread #-fsanitize=thread
+CFLAGS  := -Wall -Wextra -Werror -pthread
 NAME    := codexion
 INC		:= struct_elements.h codexion.h
 SRC     := actions_threads.c codexion.c init_elements.c parsing.c\
@@ -25,11 +25,11 @@ fclean: clean
 
 run: re
 	@echo "\n\n===========CODEXION==============\n\n"
-	@./codexion 1 800 100 100  100 10 50 "fifo"
+	@./codexion 1 400 100 100  100 10 50 "fifo"
 	@echo "\n\n===========CODEXION==============\n\n"
 	@make fclean
 
-# DO NOT EXECUTE THIS IF THE FLAG -FSANITIZE=THREAD
+# DO NOT EXECUTE THIS IF THE FLAG -fsanitize=thread
 leak: re
 	@echo "\n\n===========CODEXION==============\n\n"
 
@@ -42,9 +42,9 @@ RED   = \033[0;31m
 RESET = \033[0m
 tests: re
 	@echo "Lancement du stress test (10 itérations)..."
-	@i=1; while [ $$i -le 10 ]; do \
-		echo -n "Test $$i/10 : "; \
-		./codexion 10 800 100 100 100 5 50 "fifo" > test_output.log 2>&1; \
+	@i=1; while [ $$i -le 100 ]; do \
+		echo -n "Test $$i/100 : "; \
+		./codexion 10 800 100 100 100 10 50 "edf" > test_output.log 2>&1; \
 		if grep -q "burned out" test_output.log; then \
 			echo "$(RED)[FAILED]$(RESET)"; \
 			cat test_output.log; \
