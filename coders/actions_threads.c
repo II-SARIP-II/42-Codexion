@@ -36,14 +36,15 @@ void	precise_sleep(long sleep_time_ms, t_elements *elements)
 
 void	log_action(int id, char *msg, t_elements *elements)
 {
-	int	stop;
-
-	pthread_mutex_lock(&elements->state_lock);
-	stop = elements->stop_sim;
-	pthread_mutex_unlock(&elements->state_lock);
-	if (stop)
-		return ;
 	pthread_mutex_lock(&elements->print_lock);
+	pthread_mutex_lock(&elements->state_lock);
+	if (elements->stop_sim)
+	{
+		pthread_mutex_unlock(&elements->state_lock);
+		pthread_mutex_unlock(&elements->print_lock);
+		return ;
+	}
+	pthread_mutex_unlock(&elements->state_lock);
 	printf("%ld %d %s\n", get_delta_time(&elements->start_time), id, msg);
 	pthread_mutex_unlock(&elements->print_lock);
 }
