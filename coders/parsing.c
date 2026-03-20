@@ -44,7 +44,7 @@ int	int_verif(char *str)
 		return (-1);
 	while (str[i] != '\0')
 	{
-		if (str[i] < '0' || str[i] > '9')
+		if ((str[i] < '0' || str[i] > '9') && str[i] != '-' && str[i] != '+')
 			return (-1);
 		i++;
 	}
