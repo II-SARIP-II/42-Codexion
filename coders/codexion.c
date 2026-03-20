@@ -70,15 +70,15 @@ int	main(int argc, char **argv)
 	t_elements	*elements;
 
 	if (argc != 9)
-		return (print_errors("Error: wrong number of arguments\n", 1));
+		return (print_errors("Error: wrong number of arguments", 1));
 	if (fill_data(&parsed_datas, argv) == -1)
 		return (print_errors("Error: invalid argument\n", 1));
 	elements = init_datas(&parsed_datas);
 	if (!elements)
-		return (print_errors("Error: failed to allocate memory\n", 1));
+		return (print_errors("Error: failed to allocate memory", 1));
 	if (manage_threads(elements) == 1)
 	{
-		fprintf(stderr, "Error: failed to create threads\n");
+		fprintf(stderr, "Error: failed to create threads");
 		clear_mutex(elements);
 		clear_queue(elements);
 		return (errors(elements->coders, elements->dongles, elements, 1));
