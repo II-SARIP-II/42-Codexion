@@ -51,11 +51,9 @@ void	*manager(void *elements_param)
 	t_elements	*elements;
 	int			count;
 	t_parsed	psd;
-	t_coder		*coders;
 
 	elements = elements_param;
 	psd = elements->parsed_datas;
-	coders = elements->coders;
 	while (1)
 	{
 		count = 0;
