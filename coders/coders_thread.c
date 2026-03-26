@@ -37,7 +37,7 @@ void	coder_actions(t_thread_param	*thread_param)
 	pthread_mutex_lock(&thread_param->elements->state_lock);
 	gettimeofday(&coder->last_comp_start, NULL);
 	pthread_mutex_unlock(&thread_param->elements->state_lock);
-	action(coder->id, parsed_datas.time_to_debug,
+	action(coder->id, parsed_datas.time_to_compile,
 		thread_param->elements, "is compiling");
 	pthread_mutex_lock(&thread_param->elements->state_lock);
 	coder->comp_count++;

@@ -7,7 +7,7 @@ SRC     := actions_threads.c codexion.c init_elements.c parsing.c\
 		dongle_thread.c
 OBJS    := $(SRC:.c=.o)
 
-.PHONY: all clean fclean re try leak
+.PHONY: all clean fclean re run leak tests
 
 all: $(NAME)
 
@@ -25,7 +25,7 @@ fclean: clean
 
 run: re
 	@echo "\n\n===========CODEXION==============\n\n"
-	@./codexion 10 800 100 100  100 10 100 "fifo"
+	@./codexion 10 1000 200 100  300 10 100 "fifo"
 	@echo "\n\n===========CODEXION==============\n\n"
 	@make fclean
 
@@ -33,7 +33,7 @@ run: re
 leak: re
 	@echo "\n\n===========CODEXION==============\n\n"
 
-	@valgrind --tool=helgrind  --leak-check=full ./codexion 10 800 100 100  100 10 50 "edf"
+	@valgrind --tool=helgrind ./codexion 10 800 100 100  100 10 50 "edf"
 	@echo "\n\n===========CODEXION==============\n\n"
 	@make fclean
 

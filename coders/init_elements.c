@@ -12,7 +12,7 @@
 
 #include "codexion.h"
 
-int	new_dongle(t_dongle *dongle)
+int	new_dongle(t_dongle *dongle, int dongle_cooldown)
 {
 	dongle->lr_time.tv_sec = 0;
 	dongle->queue = malloc(sizeof(t_coder *) * 2);
@@ -24,6 +24,7 @@ int	new_dongle(t_dongle *dongle)
 	dongle->queue[1] = NULL;
 	dongle->free = 1;
 	gettimeofday(&dongle->lr_time, NULL);
+	dongle->lr_time.tv_sec -= (dongle_cooldown + 1);
 	return (0);
 }
 
@@ -37,14 +38,14 @@ void	new_coder(t_coder *coder, t_dongle *d_left, t_dongle *d_right, int id)
 	gettimeofday(&coder->last_comp_start, NULL);
 }
 
-int	create_dongles(int nb_coders, t_elements *datas)
+int	create_dongles(int nb_coders, t_elements *datas, int dongle_cooldown)
 {
 	int	i;
 
 	i = -1;
 	while (++i < nb_coders)
 	{
-		if (new_dongle(&datas->dongles[i]))
+		if (new_dongle(&datas->dongles[i], dongle_cooldown))
 		{
 			errors(datas->dongles, datas->coders, datas, 1);
 			return (1);
@@ -88,7 +89,8 @@ t_elements	*init_datas(t_parsed *parsed_datas)
 	}
 	pthread_mutex_init(&datas->print_lock, NULL);
 	pthread_mutex_init(&datas->state_lock, NULL);
-	if (create_dongles(parsed_datas->number_of_coders, datas) == 1)
+	if (create_dongles(parsed_datas->number_of_coders, datas,
+			parsed_datas->dongle_cooldown) == 1)
 		return (NULL);
 	create_coders(parsed_datas->number_of_coders, datas);
 	datas->parsed_datas = *parsed_datas;
