@@ -25,7 +25,7 @@ fclean: clean
 
 run: re
 	@echo "\n\n===========CODEXION==============\n\n"
-	@./codexion 10 400 100 100  100 10 100 "fifo"
+	@./codexion 10 800 100 100  100 10 100 "fifo"
 	@echo "\n\n===========CODEXION==============\n\n"
 	@make fclean
 
