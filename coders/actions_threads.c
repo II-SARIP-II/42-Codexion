@@ -51,6 +51,6 @@ void	log_action(int id, char *msg, t_elements *elements)
 
 void	action(int id, int time, t_elements *elements, char *msg)
 {
-	precise_sleep(time, elements);
 	log_action(id, msg, elements);
+	precise_sleep(time, elements);
 }
