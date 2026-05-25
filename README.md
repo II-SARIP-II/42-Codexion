@@ -1,5 +1,7 @@
 _This project has been created as part of the 42 curriculum by pgougne_
 
+![42 banner](assets/42banner.jpg)
+
 # Codexion
 
 ## --- Description ---
